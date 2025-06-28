@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { EmailComposer } from "@/components/email-composer"
 import { EmailPreview } from "@/components/email-preview"
 import { Button } from "@/components/ui/button"
@@ -11,15 +11,21 @@ import { useToast } from "@/hooks/use-toast"
 
 export default function HomePage() {
   const [showPreview, setShowPreview] = useState(false)
+  const [editorContent, setEditorContent] = useState<string>("");
+
   const { emailData, isValid } = useEmailStore()
   const handlePreview = () => {
     setShowPreview(true)
   }
-
+  
+   useEffect(() => {
+    const value = localStorage.getItem("editorContent");
+    setEditorContent(value||"");
+  }, []);
   const handleSend = () => {
     if (isValid()) {
       console.log("Sending email:", emailData)
-      console.log('email body:', localStorage.getItem('editorContent'))
+      console.log('email body:',editorContent)
       toast("Email scheduled successfully!", {
         description: "Your email has been scheduled for sending.",
         duration: 3000,
