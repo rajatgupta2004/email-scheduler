@@ -1,5 +1,7 @@
+"use client";
+
 import { HtmlEditor, Inject, RichTextEditorComponent, Toolbar } from '@syncfusion/ej2-react-richtexteditor';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { registerLicense } from '@syncfusion/ej2-base';
 import { Save } from 'lucide-react';
 
@@ -7,26 +9,33 @@ registerLicense('Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCeUx0TXxbf1x1ZFJMYl1bRnJPMyBoS35
 
 function RichTextEditor() {
   const rteObj = useRef<RichTextEditorComponent>(null);
-  const [btnmessage, setBtnMessage] = useState<string>('Save');
-  
-  const toolbarSettings: object = {
-    items: ['Bold', 'Italic', 'Underline', 'StrikeThrough',
-    'FontName', 'FontSize', 'FontColor', 'BackgroundColor',
-    'LowerCase', 'UpperCase', '|',
-    'Formats', 'Alignments', 'OrderedList', 'UnorderedList',
-    'Outdent', 'Indent', '|',
-    'CreateLink', '|', 'ClearFormat', 'Print',
-    'SourceCode', 'FullScreen', '|', 'Undo', 'Redo']
-  }
+  const [btnMessage, setBtnMessage] = useState<string>('Save');
+  const [initialContent, setInitialContent] = useState<string>(''); // 👈 safe initial value
 
-  
+  useEffect(() => {
+    // Access localStorage only on the client
+    const savedContent = localStorage.getItem('editorContent') || '';
+    setInitialContent(savedContent);
+  }, []);
+
+  const toolbarSettings: object = {
+    items: [
+      'Bold', 'Italic', 'Underline', 'StrikeThrough',
+      'FontName', 'FontSize', 'FontColor', 'BackgroundColor',
+      'LowerCase', 'UpperCase', '|',
+      'Formats', 'Alignments', 'OrderedList', 'UnorderedList',
+      'Outdent', 'Indent', '|',
+      'CreateLink', '|', 'ClearFormat', 'Print',
+      'SourceCode', 'FullScreen', '|', 'Undo', 'Redo'
+    ]
+  };
+
   const handleGetContent = async () => {
     if (rteObj.current) {
       setBtnMessage('Saving...');
       const content = rteObj.current.value;
-      // console.log( content);
-      localStorage.setItem('editorContent', content||"");
-      setTimeout(()=>{setBtnMessage('Save')},500)
+      localStorage.setItem('editorContent', content || '');
+      setTimeout(() => setBtnMessage('Save'), 500);
     }
   };
 
@@ -37,14 +46,13 @@ function RichTextEditor() {
         className='bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition duration-200 mb-2'
       >
         <Save className="inline mr-2" />
-        {btnmessage}
+        {btnMessage}
       </button>
-      
-      {/* Assign the ref to RichTextEditorComponent */}
+
       <RichTextEditorComponent 
         ref={rteObj}
         height={450} 
-        value={localStorage.getItem('editorContent') || ''} 
+        value={initialContent} // ✅ now it's safe
         toolbarSettings={toolbarSettings}
       >
         <Inject services={[Toolbar, HtmlEditor]} />

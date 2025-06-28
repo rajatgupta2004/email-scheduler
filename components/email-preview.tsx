@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Monitor, Smartphone, X } from "lucide-react"
 import { useEmailStore } from "@/lib/store"
 import { format } from "date-fns"
+import { useEffect, useState } from "react"
 
 interface EmailPreviewProps {
   onClose: () => void
@@ -13,6 +14,11 @@ interface EmailPreviewProps {
 
 export function EmailPreview({ onClose }: EmailPreviewProps) {
   const { emailData } = useEmailStore()
+    const [editorContent, setEditorContent] = useState<string>("");
+     useEffect(() => {
+        const value = localStorage.getItem("editorContent");
+        setEditorContent(value||"");
+      }, []);
 
   const EmailContent = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div
@@ -38,7 +44,7 @@ export function EmailPreview({ onClose }: EmailPreviewProps) {
       <div className={`p-4 ${isMobile ? "text-sm" : ""}`}>
         <div
           className="prose prose-sm max-w-none"
-        dangerouslySetInnerHTML={{ __html: localStorage.getItem('editorContent') || '<p>No content</p>' }}/>
+        dangerouslySetInnerHTML={{ __html: editorContent || '<p>No content</p>' }}/>
       </div>
 
       {/* Attachments */}
